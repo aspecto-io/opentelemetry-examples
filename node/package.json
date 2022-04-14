@@ -1,0 +1,22 @@
+{
+  "name": "get-started-otel-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.0.4",
+    "@opentelemetry/auto-instrumentations-node": "^0.28.0",
+    "@opentelemetry/exporter-jaeger": "^1.0.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.27.0",
+    "@opentelemetry/instrumentation-mongodb": "^0.29.0",
+    "@opentelemetry/sdk-node": "^0.27.0",
+    "express": "^4.17.3",
+    "mongodb": "4.3.1",
+    "opentelemetry-instrumentation-express": "^0.27.0"
+  }
+}
