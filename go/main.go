@@ -37,6 +37,14 @@ func connectMongo() {
 	opts.Monitor = otelmongo.NewMonitor()
 	opts.ApplyURI("mongodb://localhost:27017")
 	client, _ = mongo.Connect(context.Background(), opts)
+
+	//seed the database with some todo's
+	docs := []interface{}{
+		bson.D{{"id", "1"}, {"title", "Buy groceries"}},
+		bson.D{{"id", "2"}, {"title", "install Aspecto.io"}},
+		bson.D{{"id", "3"}, {"title", "Buy dogz.io domain"}},
+	}
+	client.Database("todo").Collection("todos").InsertMany(context.Background(), docs)
 }
 
 func setupWebServer() {
@@ -44,8 +52,11 @@ func setupWebServer() {
 
 	//gin OTEL instrumentation
 	r.Use(otelgin.Middleware("todo-service"))
+
 	r.GET("/todo", func(c *gin.Context) {
 		collection := client.Database("todo").Collection("todos")
+
+		//make sure to pass c.Request.Context() as the context and not c itself
 		cur, findErr := collection.Find(c.Request.Context(), bson.D{})
 		if findErr != nil {
 			c.AbortWithError(500, findErr)
