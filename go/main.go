@@ -20,14 +20,14 @@ import (
 var client *mongo.Client
 
 func main() {
-	tp, tpErr := tracing.AspectoTraceProvider()
+	tp, tpErr := tracing.JaegerTraceProvider()
 	if tpErr != nil {
 		log.Fatal(tpErr)
 	}
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 	connectMongo()
-	setupWebServer()
+	startWebServer()
 }
 
 func connectMongo() {
@@ -47,7 +47,7 @@ func connectMongo() {
 	client.Database("todo").Collection("todos").InsertMany(context.Background(), docs)
 }
 
-func setupWebServer() {
+func startWebServer() {
 	r := gin.Default()
 
 	//gin OTEL instrumentation
