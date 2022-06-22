@@ -20,7 +20,7 @@ import (
 var client *mongo.Client
 
 func main() {
-	tp, tpErr := tracing.JaegerTraceProvider()
+	tp, tpErr := tracing.AspectoTraceProvider()
 	if tpErr != nil {
 		log.Fatal(tpErr)
 	}
