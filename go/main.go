@@ -32,6 +32,8 @@ func main() {
 
 func connectMongo() {
 	opts := options.Client()
+
+	//mongo OTEL instrumentation
 	opts.Monitor = otelmongo.NewMonitor()
 	opts.ApplyURI("mongodb://localhost:27017")
 	client, _ = mongo.Connect(context.Background(), opts)
@@ -39,6 +41,8 @@ func connectMongo() {
 
 func setupWebServer() {
 	r := gin.Default()
+
+	//gin OTEL instrumentation
 	r.Use(otelgin.Middleware("todo-service"))
 	r.GET("/todo", func(c *gin.Context) {
 		collection := client.Database("todo").Collection("todos")
