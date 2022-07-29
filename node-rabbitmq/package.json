@@ -1,0 +1,21 @@
+{
+  "name": "rabbitmq",
+  "version": "1.0.0",
+  "description": "In this guide, we will demonstrate how to use OpenTelemetry in Node to create spans for different RabbitMq operations. (e.g., consume and produce). In addition, we will show you how to visualize your traces. Also covered will be RabbitMq, OpenTelemetry, distributed tracing, and how they interact.",
+  "main": "consumer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/exporter-jaeger": "^1.5.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.31.0",
+    "@opentelemetry/instrumentation-amqplib": "^0.30.0",
+    "@opentelemetry/sdk-node": "^0.31.0",
+    "@opentelemetry/sdk-trace-base": "^1.5.0",
+    "amqplib": "^0.10.1",
+    "express": "^4.18.1"
+  }
+}
