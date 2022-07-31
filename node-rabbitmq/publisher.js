@@ -15,10 +15,10 @@ const sendRabbitMqMessage = async (message) => {
   await channel.publish(exchange, '', Buffer.from(message))
 }
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   const message = 'Hello World!'
   console.log(`Send message: '${message}'`);
-  sendRabbitMqMessage(message);
+  await sendRabbitMqMessage(message);
   res.send(message)
 })
 

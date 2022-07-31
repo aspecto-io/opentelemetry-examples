@@ -13,9 +13,11 @@
     "@opentelemetry/exporter-jaeger": "^1.5.0",
     "@opentelemetry/exporter-trace-otlp-proto": "^0.31.0",
     "@opentelemetry/instrumentation-amqplib": "^0.30.0",
+    "@opentelemetry/instrumentation-http": "^0.31.0",
     "@opentelemetry/sdk-node": "^0.31.0",
     "@opentelemetry/sdk-trace-base": "^1.5.0",
     "amqplib": "^0.10.1",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "opentelemetry-instrumentation-express": "^0.29.0"
   }
 }
