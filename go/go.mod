@@ -1,4 +1,4 @@
-module github.com/aspecto-io/opentelemerty-examples
+module github.com/aspecto-io/opentelemetry-examples
 
 go 1.17
 
