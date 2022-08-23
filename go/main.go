@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aspecto-io/opentelemerty-examples/tracing"
+	"github.com/aspecto-io/opentelemetry-examples/tracing"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
