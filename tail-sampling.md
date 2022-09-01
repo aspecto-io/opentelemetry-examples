@@ -61,7 +61,7 @@ The images are hosted in a public ECR repository
 Below is an example of the configuration file to provide the collector with
 Make sure to set `ASPECTO_TOKEN` environment variable with a your aspecto token that can be found [here](https://app.aspecto.io/integration/tokens)
 
-```
+```yaml
 config_sources:
   aspecto:
     token: ${ASPECTO_TOKEN}
