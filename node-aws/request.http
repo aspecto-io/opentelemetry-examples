@@ -14,7 +14,7 @@ PUT {{api}}/items
 content-type: application/json
 
 {
-    "id": "BLABLA",
+    "id": "axsx",
     "price": 123,
     "name": "item"
 }
