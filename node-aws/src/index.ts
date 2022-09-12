@@ -9,9 +9,6 @@ function wait(ms: number) {
 }
 
 const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    console.info("ENVIRONMENT VARIABLES\n" + JSON.stringify(process.env, null, 2))
-    console.info("EVENT\n" + JSON.stringify(event, null, 2))
-    console.info("CONTEXT\n" + JSON.stringify(context, null, 2))
     let body; ``
     let statusCode = 200;
     const routeKey = `${event.httpMethod} ${event.resource}`
