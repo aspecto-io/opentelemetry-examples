@@ -78,7 +78,7 @@ const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGat
     } finally {
         body = JSON.stringify(body);
     }
-    await wait(2000);
+    await wait(250);
     return {
         statusCode,
         body,

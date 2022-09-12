@@ -16,6 +16,9 @@ const sdk = new NodeSDK({
     serviceName: process.env.SERVICE_NAME || process.env.AWS_LAMBDA_FUNCTION_NAME,
     instrumentations: [
         getNodeAutoInstrumentations({
+            "@opentelemetry/instrumentation-aws-sdk": {
+                sqsExtractContextPropagationFromPayload: true
+            },
             "@opentelemetry/instrumentation-aws-lambda": {
                 disableAwsContextPropagation: true
             }
