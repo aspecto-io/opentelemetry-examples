@@ -1,16 +1,20 @@
+use opentelemetry::global;
+
 use opentelemetry::sdk::propagation::TraceContextPropagator;
 use opentelemetry::sdk::{trace, Resource};
 use opentelemetry::KeyValue;
-use opentelemetry::{global};
+use opentelemetry::trace::Tracer;
+use opentelemetry_jaeger::JaegerTraceRuntime;
 use opentelemetry_otlp::WithExportConfig;
-use tracing_bunyan_formatter::{JsonStorageLayer, BunyanFormattingLayer};
 use std::collections::HashMap;
 use std::env;
+use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::Registry;
 use tracing_subscriber::{prelude::*, EnvFilter};
 
 pub fn init_telemetry() {
     // Define Aspecto exporter
+
     let exporter = opentelemetry_otlp::new_exporter()
         .http()
         .with_endpoint("https://otelcol.aspecto.io/v1/traces")
@@ -20,18 +24,23 @@ pub fn init_telemetry() {
         )]));
 
     // Define Tracer
-    let tracer = opentelemetry_otlp::new_pipeline()
-        .tracing()
-        .with_exporter(exporter)
-        .with_trace_config(
-            trace::config().with_resource(Resource::new(vec![KeyValue::new(
-                opentelemetry_semantic_conventions::resource::SERVICE_NAME,
-                env::var("SERVICE_NAME").unwrap().to_string(),
-            )])),
-        )
+    // let _aspecto_tracer = opentelemetry_otlp::new_pipeline()
+    //     .tracing()
+    //     .with_exporter(exporter)
+    //     .with_trace_config(
+    //         trace::config().with_resource(Resource::new(vec![KeyValue::new(
+    //             opentelemetry_semantic_conventions::resource::SERVICE_NAME,
+    //             env::var("SERVICE_NAME").unwrap().to_string(),
+    //         )])),
+    //     )
+    //     .install_batch(opentelemetry::runtime::Tokio)
+    //     .expect("Error - Failed to create tracer.");
+    let tracer = opentelemetry_jaeger::new_collector_pipeline()
+        .with_endpoint("http://localhost:14268/api/traces")
+        .with_isahc()
+        .with_service_name(env::var("SERVICE_NAME").unwrap().to_string())
         .install_batch(opentelemetry::runtime::Tokio)
         .expect("Error - Failed to create tracer.");
-
     // Define subscriber with a tracing layer to use our tracer
     let subscriber = Registry::default();
 
@@ -44,14 +53,15 @@ pub fn init_telemetry() {
         env::var("SERVICE_NAME").unwrap().to_string(),
         std::io::stdout,
     );
-    
-    // Setting a trace context prpropogation data.
-    global::set_text_map_propagator(TraceContextPropagator::new());
+
+    global::set_text_map_propagator(TraceContextPropagator::new());    
 
     subscriber
         .with(env_filter)
         .with(tracing_leyer)
         .with(JsonStorageLayer)
         .with(formatting_layer)
-        .init();
+        .init()
+
+    
 }
