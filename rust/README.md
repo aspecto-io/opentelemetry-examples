@@ -1,5 +1,4 @@
-[splash]: https://www.aspecto.io/wp-content/uploads/2022/08/OpenTelemetry-Rust-1.png
-
+![alt text](https://www.aspecto.io/wp-content/uploads/2022/08/OpenTelemetry-Rust-1.png)
 # Example of using Opentelemetry in Rust
 
 [Blog](https://www.aspecto.io/blog/distributed-tracing-with-opentelemetry-rust/)
