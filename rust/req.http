@@ -1,0 +1,26 @@
+
+
+@api = http://localhost:3000
+@userId = {{createUser.response.body.$.id}}
+###
+GET {{api}}/users
+
+###
+GET {{api}}/users/{{userId}}
+
+###
+
+# @name createUser
+POST {{api}}/users
+Content-Type: application/json
+
+{
+    "name": "Yoav"
+}
+
+###
+
+DELETE {{api}}/users/{{userId}}
+
+
+

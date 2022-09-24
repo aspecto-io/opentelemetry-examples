@@ -15,7 +15,14 @@ services:
     image: mongo
     ports:
       - "27017:27017"
-
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management-alpine
