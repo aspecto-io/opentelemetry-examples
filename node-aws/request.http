@@ -1,0 +1,20 @@
+@api = {{lambdaUrl}}
+
+###
+
+GET {{api}}/items
+
+###
+
+DELETE  {{api}}/items/500
+
+###
+
+PUT {{api}}/items
+content-type: application/json
+
+{
+    "id": "3",
+    "price": 100,
+    "name": "item number 3"
+}

@@ -1,0 +1,33 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "postbuild": "cp -R node_modules dist/node_modules",
+    "esbuild": "npm run build-lambda && npm run build-sqs-listner",
+    "esbuild-lambda": "esbuild  --bundle index.ts tracing.ts --minify --platform=node --target=es2017 --outdir=dist/lambda",
+    "esbuild-sqs-listner": "esbuild  --bundle sqs-listner.ts tracing.ts --minify --platform=node --target=es2017 --outdir=dist/service"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.103",
+    "@types/node": "^18.7.16",
+    "aws-lambda": "^1.0.7",
+    "typescript": "^4.8.2"
+  },
+  "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.32.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.32.0",
+    "@opentelemetry/instrumentation-aws-lambda": "^0.33.0",
+    "@opentelemetry/sdk-node": "^0.32.0",
+    "@opentelemetry/sdk-trace-base": "^1.6.0",
+    "aws-sdk": "^2.1211.0",
+    "sqs-consumer": "^5.7.0"
+  }
+}
