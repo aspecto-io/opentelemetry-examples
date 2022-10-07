@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-conf
+#  namespace: otel-k8s-tutorial
+  labels:
+    app: opentelemetry
+    component: otel-collector-conf
+data:
+  otel-collector-config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    exporters:
+      otlp/aspecto:
+        endpoint: otelcol.aspecto.io:4317
+        headers:
+          Authorization: a311563e-8ece-467c-97dc-6276ef3a7b14
+
+      logging:
+
+    processors:
+      batch:
+
+    extensions:
+      health_check:
+      zpages:
+        endpoint: :55679
+
+    service:
+      telemetry:
+        logs:
+          level: "debug"
+      extensions: [zpages, health_check]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [logging, otlp/aspecto]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+#  namespace: otel-k8s-tutorial
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  ports:
+    - name: otlp-grpc # Default endpoint for OpenTelemetry gRPC receiver.
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
+      port: 4318
+      protocol: TCP
+      targetPort: 4318
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 55679
+    - name: health-check
+      port: 13133
+      protocol: TCP
+      targetPort: 13133
+  selector:
+    component: otel-collector
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+#  namespace: otel-k8s-tutorial
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: opentelemetry
+      component: otel-collector
+  minReadySeconds: 5
+  replicas: 1
+  template:
+    metadata:
+    #  namespace: otel-k8s-tutorial
+      labels:
+        app: opentelemetry
+        component: otel-collector
+    spec:
+      containers:
+        - command:
+            - '/otelcol'
+            - '--config=/conf/otel-collector-config.yaml'
+          image: otel/opentelemetry-collector:latest
+          name: otel-collector
+          resources:
+            limits:
+              cpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: 200m
+              memory: 400Mi
+          ports:
+            - containerPort: 4317   #otlp grpc
+            - containerPort: 4318   # otlp http
+            - containerPort: 55679  # zpages
+            - containerPort: 13133  # health check
+            - containerPort: 14250  # Default endpoint for Jaeger gRPC receiver.
+            - containerPort: 14268  # Default endpoint for Jaeger HTTP receiver.
+          volumeMounts:
+            - name: otel-collector-config-vol
+              mountPath: /conf
+      volumes:
+        - configMap:
+            name: otel-collector-conf
+            items:
+              - key: otel-collector-config
+                path: otel-collector-config.yaml
+          name: otel-collector-config-vol
