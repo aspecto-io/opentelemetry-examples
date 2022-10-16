@@ -1,0 +1,65 @@
+---
+# Source: opentelemetry-collector/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentelemetry-collector
+  labels:
+    helm.sh/chart: opentelemetry-collector-0.34.0
+    app.kubernetes.io/name: opentelemetry-collector
+    app.kubernetes.io/instance: opentelemetry-collector
+    app.kubernetes.io/version: "0.61.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  relay: |
+    exporters:
+      jaeger:
+        endpoint: jaeger-all-in-one:14250
+        tls:
+          insecure: true
+      logging:
+        loglevel: debug
+      otlp/aspecto:
+        endpoint: otelcol.aspecto.io:4317
+        headers:
+          Authorization: ${ASPECTO_API_KEY}
+    extensions:
+      health_check: {}
+      memory_ballast: {}
+    processors:
+      memory_limiter:
+        check_interval: 5s
+        limit_mib: 409
+        spike_limit_mib: 128
+      resource:
+        attributes:
+        - action: insert
+          key: test.key
+          value: test-value
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    service:
+      extensions:
+      - health_check
+      - memory_ballast
+      pipelines:
+        traces:
+          exporters:
+          - otlp/aspecto
+          - jaeger
+          - logging
+          processors:
+          - batch
+          - resource
+          receivers:
+          - otlp
+      telemetry:
+        logs:
+          level: debug
+        metrics:
+          address: 0.0.0.0:8888

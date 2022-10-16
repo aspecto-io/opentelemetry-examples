@@ -11,14 +11,19 @@ exporters:
       Authorization: ${ASPECTO_API_KEY}
 
   logging:
+    loglevel: 'debug'
 
   jaeger:
     endpoint: jaeger-all-in-one:14250
     tls:
       insecure: true
-
 processors:
   batch:
+  resource:
+    attributes:
+      - key: test.key
+        value: 'test-value'
+        action: insert
 
 extensions:
   health_check:

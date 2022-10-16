@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: otel-collector-conf
-#  namespace: otel-k8s-tutorial
+  namespace: opentelemetry
   labels:
     app: opentelemetry
     component: otel-collector-conf
@@ -13,23 +13,27 @@ data:
         protocols:
           grpc:
           http:
-
     exporters:
       otlp/aspecto:
         endpoint: otelcol.aspecto.io:4317
         headers:
-          Authorization: a311563e-8ece-467c-97dc-6276ef3a7b14
-
+          Authorization: ${ASPECTO_API_KEY}
+      jaeger:
+        endpoint: jaeger-all-in-one:14250
+        tls:
+          insecure: true  
       logging:
-
     processors:
       batch:
-
+      resource:
+        attributes:
+          - key: test.key
+            value: "test-value"
+            action: insert
     extensions:
       health_check:
       zpages:
         endpoint: :55679
-
     service:
       telemetry:
         logs:
@@ -38,14 +42,37 @@ data:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch]
-          exporters: [logging, otlp/aspecto]
+          processors: [batch, resource]
+          exporters: [logging, otlp/aspecto, jaeger]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector-in
+  namespace: opentelemetry
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  type: ClusterIP
+  selector:
+    component: otel-collector
+  ports:
+    - name: otlp-grpc # Default endpoint for OpenTelemetry gRPC receiver.
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
+      port: 4318
+      protocol: TCP
+      targetPort: 4318
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: otel-collector
-#  namespace: otel-k8s-tutorial
+  namespace: opentelemetry
   labels:
     app: opentelemetry
     component: otel-collector
@@ -75,7 +102,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: otel-collector
-#  namespace: otel-k8s-tutorial
+  namespace: opentelemetry
   labels:
     app: opentelemetry
     component: otel-collector
@@ -88,7 +115,7 @@ spec:
   replicas: 1
   template:
     metadata:
-    #  namespace: otel-k8s-tutorial
+      namespace: opentelemetry
       labels:
         app: opentelemetry
         component: otel-collector
@@ -97,6 +124,13 @@ spec:
         - command:
             - '/otelcol'
             - '--config=/conf/otel-collector-config.yaml'
+          env:
+            - name: ASPECTO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aspecto
+                  key: api-key
+                  optional: false
           image: otel/opentelemetry-collector:latest
           name: otel-collector
           resources:
@@ -107,12 +141,12 @@ spec:
               cpu: 200m
               memory: 400Mi
           ports:
-            - containerPort: 4317   #otlp grpc
-            - containerPort: 4318   # otlp http
-            - containerPort: 55679  # zpages
-            - containerPort: 13133  # health check
-            - containerPort: 14250  # Default endpoint for Jaeger gRPC receiver.
-            - containerPort: 14268  # Default endpoint for Jaeger HTTP receiver.
+            - containerPort: 4317 #otlp grpc
+            - containerPort: 4318 # otlp http
+            - containerPort: 55679 # zpages
+            - containerPort: 13133 # health check
+            - containerPort: 14250 # Default endpoint for Jaeger gRPC receiver.
+            - containerPort: 14268 # Default endpoint for Jaeger HTTP receiver.
           volumeMounts:
             - name: otel-collector-config-vol
               mountPath: /conf

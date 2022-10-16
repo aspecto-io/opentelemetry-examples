@@ -2,7 +2,6 @@ import { trace } from '@opentelemetry/api';
 import * as opentelemetry from '@opentelemetry/sdk-node';
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
 const otelColEndpoint =
   process.env.OTEL_COL_OTLP_ENDPOINT || 'http://localhost:4318/v1/traces';
