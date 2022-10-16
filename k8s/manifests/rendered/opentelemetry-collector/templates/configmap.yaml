@@ -27,6 +27,7 @@ data:
       health_check: {}
       memory_ballast: {}
     processors:
+      batch: {}
       memory_limiter:
         check_interval: 5s
         limit_mib: 409

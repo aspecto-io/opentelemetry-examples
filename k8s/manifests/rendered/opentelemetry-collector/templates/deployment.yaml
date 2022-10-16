@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9d9c9bd0e213da1c43cc6d9742c3390254c8bf97325c5a889cfde3a244316969
+        checksum/config: 1e6e7b1a23781151a52102537bbd5427d84b2fc36c91b7373e42a9a6ed3fbe39
         
       labels:
         app.kubernetes.io/name: opentelemetry-collector
@@ -32,17 +32,17 @@ spec:
         
     spec:
       
-      serviceAccountName: opentelemetry-collector
+      serviceAccountName: default
       securityContext:
         {}
       containers:
         - name: opentelemetry-collector
           command:
-            - /otelcol-contrib
+            - /otelcol
             - --config=/conf/relay.yaml
           securityContext:
             {}
-          image: "otel/opentelemetry-collector-contrib:0.61.0"
+          image: "otel/opentelemetry-collector:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: otlp

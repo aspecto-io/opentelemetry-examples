@@ -12,8 +12,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     component: standalone-collector
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports: 
+    
     - name: otlp
       port: 4317
       targetPort: 4317
