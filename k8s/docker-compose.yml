@@ -1,0 +1,48 @@
+version: '2'
+services:
+  # Jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - '16686:16686'
+      - '14268:14268'
+      - '14250:14250'
+  # Collector
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ['--config=/etc/otel-collector-config.yml']
+    environment:
+      - ASPECTO_API_KEY=${ASPECTO_API_KEY}
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - '13133:13133' # health_check extension
+      - '4317:4317' # OTLP gRPC receiver
+      - '4318:4318' # OTLP http receiver
+      - '55679:55679' # zpages extension
+    depends_on:
+      - jaeger-all-in-one
+
+  client:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/client
+    environment:
+      - SERVICE_NAME=demo-client
+      - OTEL_COL_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
+      - SERVER_ENDPOINT=http://server:3000
+    depends_on:
+      - server
+
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/server
+    environment:
+      - SERVICE_NAME=demo-server
+      - OTEL_COL_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
+    ports:
+      - '3000:3000'
+    depends_on:
+      - otel-collector
+  
