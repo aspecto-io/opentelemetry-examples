@@ -1,0 +1,43 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: opentelemetry
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  mode: deployment
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    exporters:
+      jaeger:
+        endpoint: jaeger-all-in-one:14250
+        tls:
+          insecure: true  
+      logging:
+    processors:
+      batch:
+      resource:
+        attributes:
+          - key: test.key
+            value: "test-value"
+            action: insert
+    extensions:
+      health_check:
+      zpages:
+        endpoint: :55679
+    service:
+      telemetry:
+        logs:
+          level: "debug"
+      extensions: [zpages, health_check]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch, resource]
+          exporters: [logging, jaeger]

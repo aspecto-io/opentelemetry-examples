@@ -23,26 +23,26 @@ services:
     depends_on:
       - jaeger-all-in-one
 
-  # client:
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: ./services/client
-  #   environment:
-  #     - SERVICE_NAME=demo-client
-  #     - OTEL_COL_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
-  #     - SERVER_ENDPOINT=http://server:3000
-  #   depends_on:
-  #     - server
+  client:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/client
+    environment:
+      - SERVICE_NAME=demo-client
+      - OTEL_COL_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
+      - SERVER_ENDPOINT=http://server:3000
+    depends_on:
+      - server
 
-  # server:
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: ./services/server
-  #   environment:
-  #     - SERVICE_NAME=demo-server
-  #     - OTEL_COL_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
-  #   ports:
-  #     - '3000:3000'
-  #   depends_on:
-  #     - otel-collector
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/server
+    environment:
+      - SERVICE_NAME=demo-server
+      - OTEL_COL_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
+    ports:
+      - '3000:3000'
+    depends_on:
+      - otel-collector
   
