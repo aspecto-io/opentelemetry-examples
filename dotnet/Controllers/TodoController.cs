@@ -5,7 +5,7 @@ using dotnet.Models;
 namespace dotnet.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class TodoController : ControllerBase
 {
     private readonly IMongoCollection<Todo> _todos;
