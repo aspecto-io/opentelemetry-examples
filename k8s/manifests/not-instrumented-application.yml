@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: express-server
+  namespace: application
+  labels:
+    app: application
+    component: express-server
+spec:
+  ports:
+    - name: express # Default endpoint for OpenTelemetry gRPC receiver.
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    component: express-server
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-server
+  namespace: application
+  labels:
+    app: application
+    component: express-server
+spec:
+  selector:
+    matchLabels:
+      app: application
+      component: express-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: application
+        component: express-server
+      annotations:
+        instrumentation.opentelemetry.io/inject-nodejs: 'nodejs-instrumentation'
+        sidecar.opentelemetry.io/inject: 'sidecar'
+    spec:
+      containers:
+        - name: express-server
+          ports:
+            - containerPort: 3000
+          image: example-express-server
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: '128Mi'
+              cpu: '500m'

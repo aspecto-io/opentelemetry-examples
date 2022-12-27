@@ -1,0 +1,42 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  otlp/aspecto:
+    endpoint: otelcol.aspecto.io:4317
+    headers:
+      Authorization: ${ASPECTO_API_KEY}
+
+  logging:
+    loglevel: 'debug'
+
+  jaeger:
+    endpoint: jaeger-all-in-one:14250
+    tls:
+      insecure: true
+processors:
+  batch:
+  resource:
+    attributes:
+      - key: test.key
+        value: 'test-value'
+        action: insert
+
+extensions:
+  health_check:
+  zpages:
+    endpoint: :55679
+
+service:
+  telemetry:
+    logs:
+      level: 'debug'
+  extensions: [zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, jaeger, otlp/aspecto]

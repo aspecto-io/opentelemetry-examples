@@ -1,0 +1,72 @@
+mode: deployment
+
+ports:
+  jaeger-compact:
+    enabled: false
+  jaeger-thrift:
+    enabled: false
+  jaeger-grpc:
+    enabled: false
+  zipkin:
+    enabled: false
+
+config:
+  receivers:
+    jaeger: null
+    prometheus: null
+    zipkin: null
+  exporters:
+    otlp/aspecto:
+      endpoint: otelcol.aspecto.io:4317
+      headers:
+        Authorization: ${ASPECTO_API_KEY}
+    jaeger:
+      endpoint: jaeger-all-in-one:14250
+      tls:
+        insecure: true
+    logging:
+      loglevel: debug
+  processors:
+    resource:
+      attributes:
+        - key: test.key
+          value: "test-value"
+          action: insert
+  service:
+    telemetry:
+      logs:
+        level: debug
+    pipelines:
+      traces:
+        receivers:
+          - otlp
+        processors:
+          - batch
+          - resource
+        exporters:
+          - otlp/aspecto
+          - jaeger
+          - logging
+      metrics: null
+      logs: null
+
+service:
+  type: LoadBalancer
+
+extraEnvs:
+  - name: ASPECTO_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: aspecto
+        key: api-key
+        optional: false
+
+image:
+  repository: otel/opentelemetry-collector
+  tag: "latest"
+
+command:
+  name: otelcol
+
+serviceAccount:
+  create: false
