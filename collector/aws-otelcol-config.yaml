@@ -1,0 +1,42 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+
+exporters:
+  logging:
+    loglevel: debug
+  awsxray:
+    region: 'us-west-2'
+  awsemf:
+    region: 'us-west-2'
+  otlp/aspecto:
+    endpoint: otelcol.aspecto.io:4317
+    headers:
+      Authorization: ${ASPECTO_TOKEN}
+
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp/aspecto]
+    metrics:
+      receivers: [otlp]
+      exporters: [awsemf]
+
+  extensions: [pprof]
+  telemetry:
+    logs:
+      level: debug
