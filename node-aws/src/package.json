@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@opentelemetry/auto-instrumentations-node": "^0.32.0",
-    "@opentelemetry/exporter-trace-otlp-proto": "^0.32.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.41.0",
     "@opentelemetry/instrumentation-aws-lambda": "^0.33.0",
     "@opentelemetry/sdk-node": "^0.32.0",
     "@opentelemetry/sdk-trace-base": "^1.6.0",
